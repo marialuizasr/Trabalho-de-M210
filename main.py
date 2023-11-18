@@ -1,6 +1,6 @@
-from src.ppl import LinearProgrammingModels
+from simplex import Simplex
 
-ppl = LinearProgrammingModels()
+ppl = Simplex()
 
 tryAgain = True
 lucro = None

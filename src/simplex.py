@@ -1,6 +1,6 @@
 infinity = 1000000000000000000
 
-class LinearProgrammingModels():
+class Simplex():
     def __init__(self) -> None:
         pass
 
