@@ -72,8 +72,6 @@ class LinearProgrammingModels():
                     newElement = element + auxSimplexTable[index][self.pivotColumnIndex]*self.referenceLine[position]*(-1)
                     newLine.append(newElement)
                 self.simplexTable[index] = newLine
-        
-        print('\nself.simplexTable::::', self.simplexTable)
 
 
     def checkIfThereIsNegativeNumberInTargetFunction(self):
