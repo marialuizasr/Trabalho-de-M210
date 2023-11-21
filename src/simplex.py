@@ -5,6 +5,7 @@ class Simplex():
         pass
 
     def setTargetFunction(self, targetFunction, target):
+        self.iteration = 0
         self.targetFunction = targetFunction
         self.target = target
 
@@ -15,28 +16,28 @@ class Simplex():
         simplexTable = self.constraints
         simplexTable.insert(0, self.targetFunction)
         self.simplexTable = simplexTable
+        return self.simplexTable
 
-    def findLargestNegativeValueInZ(self):
+    def findLargestNegativeValueInZ(self, simplexTable):
         largestNegative = None
         largestNegativeIndex = None
-        for index, item in enumerate(self.simplexTable[0]):
+        for index, item in enumerate(simplexTable[0]):
             if item < 0 and (largestNegative is None or item < largestNegative):
                 largestNegative = item
                 largestNegativeIndex = index
-
         self.largestNegative = largestNegative
         self.pivotColumnIndex = largestNegativeIndex
-        return largestNegative
+        return [self.largestNegative, self.pivotColumnIndex]
 
-    def findPivotLine(self):
+    def findPivotLine(self, simplexTable, pivotColumnIndex):
         relations = []
         smallestRelation = None
         smallestRelationIndex = None
 
-        for item in enumerate(self.simplexTable):
+        for item in enumerate(simplexTable):
             rightSide = item[1][-1]
-            valueInPivotColumn = item[1][self.pivotColumnIndex]
-            if(valueInPivotColumn != 0):
+            valueInPivotColumn = item[1][pivotColumnIndex]
+            if(valueInPivotColumn > 0):
                 relation = rightSide/valueInPivotColumn
             else:
                 relation = infinity
@@ -47,34 +48,43 @@ class Simplex():
                     smallestRelation = relation
                     smallestRelationIndex = index
         self.pivotLineIndex = smallestRelationIndex
+        return self.pivotLineIndex
     
-    def findPivotItem(self):
-        pivotItem = self.simplexTable[self.pivotLineIndex][self.pivotColumnIndex]
+    def findPivotItem(self, simplexTable, pivotLineIndex, pivotColumnIndex):
+        pivotItem = simplexTable[pivotLineIndex][pivotColumnIndex]
         self.pivotItem = pivotItem
+        return self.pivotItem
 
-    def setNewPivotLine(self):
-        auxPivotLine = self.simplexTable[self.pivotLineIndex]
+    def setNewPivotLine(self, simplexTable, pivotLineIndex, pivotItem):
+        auxPivotLine = simplexTable[pivotLineIndex]
         newPivotLine = []
 
         for value in auxPivotLine:
-            newValueInPivotLine = value/self.pivotItem
+            newValueInPivotLine = value/pivotItem
             newPivotLine.append(newValueInPivotLine)
 
-        self.simplexTable[self.pivotLineIndex] = newPivotLine
+        self.simplexTable[pivotLineIndex] = newPivotLine
         self.referenceLine = newPivotLine
+        return [self.referenceLine, self.simplexTable]
     
-    def updateRows(self):
-        auxSimplexTable = self.simplexTable
+    def updateRows(self, simplexTable, pivotLineIndex, pivotColumnIndex, referenceLine):
+        auxSimplexTable = simplexTable
         for index, row in enumerate(auxSimplexTable):
-            if(index != self.pivotLineIndex):
+            if(index != pivotLineIndex):
                 newLine = []
                 for position, element in enumerate(row):
-                    newElement = element + auxSimplexTable[index][self.pivotColumnIndex]*self.referenceLine[position]*(-1)
+                    newElement = element + auxSimplexTable[index][pivotColumnIndex]*referenceLine[position]*(-1)
                     newLine.append(newElement)
-                self.simplexTable[index] = newLine
+                simplexTable[index] = newLine
+        self.simplexTable = simplexTable
+        return simplexTable
 
 
     def checkIfThereIsNegativeNumberInTargetFunction(self):
+        print(self.simplexTable)
+        # if(self.iteration == 4):
+        #     return [False, 1000]
+        self.iteration += 1
         for value in self.simplexTable[0]:
             if value < 0:
                 return [True, 0]

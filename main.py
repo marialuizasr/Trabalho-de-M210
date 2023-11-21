@@ -1,4 +1,4 @@
-from simplex import Simplex
+from src.simplex import Simplex
 
 ppl = Simplex()
 
@@ -12,16 +12,38 @@ constraints = [
     # [0.25, 0.5, 0, 0, 1, 50],
 ]
 
+# targetFunction = [-5, -7, 0, 0, 0, 0]
+# constraints = [
+#     [3, 0, 1, 0, 0, 250],
+#     [0, 1.5, 0, 1, 0, 100],
+#     [0.25, 0.5, 0, 0, 1, 50],
+# ]
+
+
+# targetFunction = [-25, -50, 0, 0, 0, 0]
+# constraints = [
+#     [7, 5, 1, 0, 0, 35],
+#     [4, 6, 0, 1, 0, 24],
+#     [3, 10, 0, 0, 1, 30]
+# ]
+
+# targetFunction = [0.06, 0.08, 0, 0, 0, 0]
+# constraints = [
+#     [8, 6, -1, 0, 0, 48],
+#     [1, 2, 0, -1, 0, 12],
+#     [1, 2, 0, 0, 1, 20]
+# ]
+
 ppl.setTargetFunction(targetFunction, 'max')
 ppl.setConstraints(constraints)
-ppl.setSimplexTable()
+simplexTable = ppl.setSimplexTable()
 
 while (tryAgain):
-    ppl.findLargestNegativeValueInZ()
-    ppl.findPivotLine()
-    ppl.findPivotItem()
-    ppl.setNewPivotLine()
-    ppl.updateRows()
+    [largestNegative, pivotColumnIndex] = ppl.findLargestNegativeValueInZ(simplexTable)
+    pivotLineIndex = ppl.findPivotLine(simplexTable, pivotColumnIndex)
+    pivotItem = ppl.findPivotItem(simplexTable, pivotLineIndex, pivotColumnIndex)
+    [referenceLine, simplexTable] = ppl.setNewPivotLine(simplexTable, pivotLineIndex, pivotItem)
+    simplexTable = ppl.updateRows(simplexTable, pivotLineIndex, pivotColumnIndex, referenceLine)
     [tryAgain, lucro] = ppl.checkIfThereIsNegativeNumberInTargetFunction()
 
 print('Lucro:', lucro)
