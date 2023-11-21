@@ -91,9 +91,3 @@ class Simplex():
             if value < 0:
                 return [True, 0]
         return [False, self.simplexTable[0][-1]]
-
-
-
-        
-        
-
