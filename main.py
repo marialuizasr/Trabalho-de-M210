@@ -5,12 +5,12 @@ ppl = Simplex()
 tryAgain = True
 lucro = None
 
-targetFunction = [-5, -7, -8, 0, 0, 0]
-constraints = [
-    [1, 1, 2, 1, 0, 1190],
-    [3, 4.5, 1, 0, 1, 4000],
-    # [0.25, 0.5, 0, 0, 1, 50],
-]
+# targetFunction = [-5, -7, -8, 0, 0, 0]
+# constraints = [
+#     [1, 1, 2, 1, 0, 1190],
+#     [3, 4.5, 1, 0, 1, 4000],
+#     # [0.25, 0.5, 0, 0, 1, 50],
+# ]
 
 # targetFunction = [-5, -7, 0, 0, 0, 0]
 # constraints = [
@@ -34,7 +34,17 @@ constraints = [
 #     [1, 2, 0, 0, 1, 20]
 # ]
 
-ppl.setTargetFunction(targetFunction, 'max')
+targetFunction = [12, 7, 0, 0, 0, 0, 0]
+constraints = [
+    [2, 1, -1, 0, 0, 0, 4],
+    [1, 6, 0, -1, 0, 0, 6],
+    [1, 0, 0, 0, 1, 0, 4],
+    [0, 1, 0, 0, 0, 1, 6],
+]
+
+ppl.setTargetFunction(targetFunction, 'min')
+# ppl.setTargetFunction(targetFunction, 'max')
+
 ppl.setConstraints(constraints)
 simplexTable = ppl.setSimplexTable()
 

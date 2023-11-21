@@ -22,7 +22,11 @@ class Simplex():
         largestNegative = None
         largestNegativeIndex = None
         for index, item in enumerate(simplexTable[0]):
-            if item < 0 and (largestNegative is None or item < largestNegative):
+            if self.target == 'max' and item < 0 and (largestNegative is None or item < largestNegative):
+                largestNegative = item
+                largestNegativeIndex = index
+
+            if self.target == 'min' and item > 0 and (largestNegative is None or item > largestNegative):
                 largestNegative = item
                 largestNegativeIndex = index
         self.largestNegative = largestNegative
@@ -81,10 +85,8 @@ class Simplex():
 
 
     def checkIfThereIsNegativeNumberInTargetFunction(self):
-        print(self.simplexTable)
-        # if(self.iteration == 4):
-        #     return [False, 1000]
-        self.iteration += 1
+        if(self.target == 'min'):
+            return [False, self.simplexTable]
         for value in self.simplexTable[0]:
             if value < 0:
                 return [True, 0]
