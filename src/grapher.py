@@ -2,8 +2,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 class Grapher:
-    def __init__(self):
-        pass
+
+    def __init__(self, config):
+        self.config = config
 
     def plot_2d(self, restrictions, target_function=None):
 
@@ -35,6 +36,11 @@ class Grapher:
         # Plots the target function
         # ax.plot(target_function[0], target_function[1], color='black')
 
+        # Set labels from config
+        ax.set_title('Método Gráfico')
+        ax.set_xlabel(self.config['x'])
+        ax.set_ylabel(self.config['y'])
+
         # Shows the graph
         plt.show()
 
@@ -45,6 +51,7 @@ class Grapher:
 if __name__ == '__main__':
 
     restrictions = [{'x1':2, 'x2':4, 'y':16, 'type':'more'}, {'x1':3, 'x2':2, 'y':12, 'type':'less'}]
+    config = {'x':'nome do eixo X', 'y':'nome do eixo Y'}
 
-    grapher = Grapher()
+    grapher = Grapher(config)
     grapher.plot_2d(restrictions)
