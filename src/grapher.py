@@ -9,9 +9,9 @@ class Grapher:
     def plot_2d(self, restrictions, target_function=None, config=None):
 
         # Transform restrictions into a list of coordinates where it crosses the x and y axis on the graph
-        restrictions = [{'x':(restriction['y']/restriction['x1'], 0), 
-                         'y':(0, restriction['y']/restriction['x2']), 
-                         'type':restriction['type']} for restriction in restrictions]
+        restrictions = [{'x': (restriction['y']/restriction['x1'] if restriction['x1'] != 0 else 0, 0), 
+                         'y': (0, restriction['y']/restriction['x2'] if restriction['x2'] != 0 else 0), 
+                         'type': restriction['type']} for restriction in restrictions]
 
         # Calculate min and max values from restrictions
         max_x = max(restriction['x'][0] for restriction in restrictions)
@@ -42,16 +42,16 @@ class Grapher:
         ax.set_ylabel(config['y'])
 
         # Shows the graph
-        plt.show()
+        plt.show(block=False)
 
 
     def plot_3d(self, restrictions, target_function=None, config=None):
         
         # Transform restrictions into a list of coordinates where it crosses the x and y axis on the graph
-        restrictions = [{'x':(restriction['y']/restriction['x1'], 0, 0), 
-                         'y':(0, restriction['y']/restriction['x2'], 0), 
-                         'z':(0, 0, restriction['y']/restriction['x3']),
-                         'type':restriction['type']} for restriction in restrictions]
+        restrictions = [{'x': (restriction['y']/restriction['x1'] if restriction['x1'] != 0 else 0, 0, 0), 
+                         'y': (0, restriction['y']/restriction['x2'] if restriction['x2'] != 0 else 0, 0), 
+                         'z': (0, 0, restriction['y']/restriction['x3'] if restriction['x3'] != 0 else 0),
+                         'type': restriction['type']} for restriction in restrictions]
         
         # Calculate min and max values from restrictions
         max_x = max(restriction['x'][0] for restriction in restrictions)
@@ -90,14 +90,19 @@ class Grapher:
         ax.set_zlabel(config['z'])
 
         # Shows the graph
-        plt.show()
+        plt.show(block=False)
+
+    # Meybe???
+    def plot_4d(self, restrictions, target_function=None, config=None):
+        pass
+
 
 
 if __name__ == '__main__':
 
     restrictions_2d = [{'x1':2, 'x2':4, 'y':16, 'type':'less'}, {'x1':3, 'x2':2, 'y':12, 'type':'less'}]
     restrictions_3d = [{'x1':1, 'x2':2, 'x3':3, 'y':30, 'type':'less'}, {'x1':2, 'x2':1, 'x3':1, 'y':20, 'type':'more'}, {'x1':1, 'x2':1, 'x3':2, 'y':24, 'type':'less'}]
-    config = {'x':'nome do eixo X', 'y':'nome do eixo Y', 'z':'nome do eixo Z'}
+    config = {'x':'eixo X', 'y':'eixo Y', 'z':'eixo Z'}
 
     grapher = Grapher()
     # grapher.plot_2d(restrictions_2d, config=config)
