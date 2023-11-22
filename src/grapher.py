@@ -1,3 +1,4 @@
+import time
 from matplotlib.patches import Polygon
 import matplotlib.pyplot as plt
 import numpy as np
@@ -55,7 +56,7 @@ class Grapher:
         ax.set_ylabel(config['y'])
 
         # Shows the graph
-        plt.show(block=True)
+        plt.show(block=False)
 
 
     def plot_3d(self, restrictions, target_function=None, config=None):
@@ -119,4 +120,6 @@ if __name__ == '__main__':
 
     grapher = Grapher()
     grapher.plot_2d(restrictions_2d, config=config)
-    # grapher.plot_3d(restrictions_3d, config=config)
+    grapher.plot_3d(restrictions_3d, config=config)
+
+    time.sleep(30)
