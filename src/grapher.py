@@ -1,5 +1,6 @@
-import numpy as np
+from matplotlib.patches import Polygon
 import matplotlib.pyplot as plt
+import numpy as np
 
 class Grapher:
 
@@ -29,9 +30,21 @@ class Grapher:
 
         # Plots the restrictions
         for restriction in restrictions:
-            color = 'red' if restriction['type'] == 'less' else 'blue' if restriction['type'] == 'equal' else 'green'
+            color = 'red' if restriction['type'] == 'less' else 'green' if restriction['type'] == 'more' else 'blue'
             ax.plot(restriction['x'], restriction['y'], color='black', alpha=0.8, linewidth=0.8)
-            ax.fill_between(restriction['x'], restriction['y'], color=color, alpha=0.05)
+            
+            if restriction['type'] == 'more':
+                poly_points = [
+                    (restriction['x'][0], restriction['y'][0]),
+                    (restriction['x'][1], restriction['y'][1]),
+                    (restriction['x'][1], ax.get_ylim()[1]),
+                    (ax.get_xlim()[1], ax.get_ylim()[1]),
+                    (ax.get_xlim()[1], restriction['y'][0])
+                ]
+                poly = Polygon(poly_points, closed=False, color=color, alpha=0.05)
+                ax.add_patch(poly)
+            else:
+                ax.fill_between(restriction['x'], restriction['y'], color=color, alpha=0.05)
 
         # Plots the target function
         # ax.plot(target_function[0], target_function[1], color='black')
@@ -42,7 +55,7 @@ class Grapher:
         ax.set_ylabel(config['y'])
 
         # Shows the graph
-        plt.show(block=False)
+        plt.show(block=True)
 
 
     def plot_3d(self, restrictions, target_function=None, config=None):
@@ -71,7 +84,7 @@ class Grapher:
 
         # Plots the restrictions as planes on the graph
         for restriction in restrictions:
-            color = 'red' if restriction['type'] == 'less' else 'blue' if restriction['type'] == 'equal' else 'green'
+            color = 'red' if restriction['type'] == 'less' else 'green' if restriction['type'] == 'more' else 'blue'
             ax.plot_trisurf(restriction['x'], restriction['y'], restriction['z'], color=color, alpha=0.333)
 
             # Create a grid for the base surface
@@ -100,10 +113,10 @@ class Grapher:
 
 if __name__ == '__main__':
 
-    restrictions_2d = [{'x1':2, 'x2':4, 'y':16, 'type':'less'}, {'x1':3, 'x2':2, 'y':12, 'type':'less'}]
+    restrictions_2d = [{'x1':2, 'x2':4, 'y':16, 'type':'more'}, {'x1':3, 'x2':2, 'y':12, 'type':'less'}]
     restrictions_3d = [{'x1':1, 'x2':2, 'x3':3, 'y':30, 'type':'less'}, {'x1':2, 'x2':1, 'x3':1, 'y':20, 'type':'more'}, {'x1':1, 'x2':1, 'x3':2, 'y':24, 'type':'less'}]
     config = {'x':'eixo X', 'y':'eixo Y', 'z':'eixo Z'}
 
     grapher = Grapher()
-    # grapher.plot_2d(restrictions_2d, config=config)
-    grapher.plot_3d(restrictions_3d, config=config)
+    grapher.plot_2d(restrictions_2d, config=config)
+    # grapher.plot_3d(restrictions_3d, config=config)
