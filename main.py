@@ -1,5 +1,6 @@
 import tkinter as tk
 from src.simplex import Simplex
+from src.grapher import Grapher
 
 class SimplexGUI:
     def __init__(self, master):
@@ -49,6 +50,27 @@ class SimplexGUI:
         constraints_text = self.entry_constraints.get("1.0", tk.END).split('\n')[:-1]
         constraints = [list(map(float, line.split(','))) for line in constraints_text]
 
+        num_vars = sum(1 for x in target_function if x != 0)
+        restrictions = []
+        for constraint in constraints:
+            restriction = {
+                f'x{i+1}': constraint[i] for i in range(num_vars)
+            }
+            restriction['y'] = constraint[-1]
+
+            type_index = next((i for i, x in enumerate(constraint[num_vars:-1], num_vars) if x != 0), None)
+            restriction['type'] = 'less' if constraint[type_index] == 1 else 'more'
+
+            restrictions.append(restriction)
+
+        config = {'x':'eixo X', 'y':'eixo Y', 'z':'eixo Z'}
+        grapher = Grapher()
+
+        if num_vars == 2:
+            grapher.plot_2d(restrictions, config=config)
+        elif num_vars == 3:
+            grapher.plot_3d(restrictions, config=config)
+
         optimization_type = self.entry_optimization_type.get().lower()
 
         ppl.setTargetFunction(target_function, optimization_type)
@@ -72,3 +94,12 @@ if __name__ == "__main__":
     root = tk.Tk()
     app = SimplexGUI(root)
     root.mainloop()
+
+'''
+12,7,0,0,0,0,0
+
+2,1,-1,0,0,0,4
+1,6,0,-1,0,0,6
+1,0,0,0,1,0,4
+0,1,0,0,0,1,6
+'''
