@@ -1,22 +1,23 @@
-from src.simplex import Simplex
+from src.simplexRefactor import Simplex
 
 ppl = Simplex()
 
 tryAgain = True
 lucro = None
 
-# targetFunction = [-5, -7, -8, 0, 0, 0]
-# constraints = [
-#     [1, 1, 2, 1, 0, 1190],
-#     [3, 4.5, 1, 0, 1, 4000],
-#     # [0.25, 0.5, 0, 0, 1, 50],
-# ]
+targetFunction = [-5, -7, -8]
+numberOfConstraints = 2
+constraints = [
+    [1, 1, 2, 1190],
+    [3, 4.5, 1, 4000],
+]
 
-# targetFunction = [-5, -7, 0, 0, 0, 0]
+# targetFunction = [-5, -7]
+# numberOfConstraints = 3
 # constraints = [
-#     [3, 0, 1, 0, 0, 250],
-#     [0, 1.5, 0, 1, 0, 100],
-#     [0.25, 0.5, 0, 0, 1, 50],
+#     [3, 0, 250],
+#     [0, 1.5, 100],
+#     [0.25, 0.5, 50],
 # ]
 
 
@@ -34,16 +35,29 @@ lucro = None
 #     [1, 2, 0, 0, 1, 20]
 # ]
 
-targetFunction = [12, 7, 0, 0, 0, 0, 0]
-constraints = [
-    [2, 1, -1, 0, 0, 0, 4],
-    [1, 6, 0, -1, 0, 0, 6],
-    [1, 0, 0, 0, 1, 0, 4],
-    [0, 1, 0, 0, 0, 1, 6],
-]
+# targetFunction = [12, 7, 0, 0, 0, 0, 0]
+# constraints = [
+#     [2, 1, -1, 0, 0, 0, 4],
+#     [1, 6, 0, -1, 0, 0, 6],
+#     [1, 0, 0, 0, 1, 0, 4],
+#     [0, 1, 0, 0, 0, 1, 6],
+# ]
 
-ppl.setTargetFunction(targetFunction, 'min')
-# ppl.setTargetFunction(targetFunction, 'max')
+# ppl.setTargetFunction(targetFunction, 'min')
+
+#### PSEUDO CÓDIGO
+
+# entre com a funcao objetivo (coeficientes)
+
+# entre com o número de restricoes
+
+# entre com as restricoes
+
+ppl.setTargetFunction(targetFunction, 'max')
+
+ppl.setNumberOfConstraints(numberOfConstraints)
+
+ppl.formatTargetFunction()
 
 ppl.setConstraints(constraints)
 simplexTable = ppl.setSimplexTable()

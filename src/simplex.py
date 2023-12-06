@@ -9,8 +9,28 @@ class Simplex():
         self.targetFunction = targetFunction
         self.target = target
 
+    def setNumberOfConstraints(self, numberOfConstraints):
+        self.numberOfConstraints = numberOfConstraints
+
+    def formatTargetFunction(self):
+        targetFunctionCopy = self.targetFunction
+        for index in range(self.numberOfConstraints + 1):
+            targetFunctionCopy.append(0)
+        self.targetFunction = targetFunctionCopy
+        print(self.targetFunction)
+
     def setConstraints(self, constraints):
-        self.constraints = constraints
+        formatedConstraints = []
+        constraintsLen = len(constraints)
+        for constraintIndex, constraint in enumerate(constraints):
+            formatedConstraint = constraint
+            for index in range(constraintsLen):
+                if(constraintIndex == index):
+                    formatedConstraint.insert(-1, 1)
+                else:
+                    formatedConstraint.insert(-1, 0)
+            formatedConstraints.append(formatedConstraint)
+        self.constraints = formatedConstraints
     
     def setSimplexTable(self):
         simplexTable = self.constraints
