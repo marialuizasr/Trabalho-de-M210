@@ -1,4 +1,4 @@
-from src.simplexRefactor import Simplex
+from src.simplex import Simplex
 
 ppl = Simplex()
 
@@ -8,8 +8,8 @@ lucro = None
 targetFunction = [-5, -7, -8]
 numberOfConstraints = 2
 constraints = [
-    [1, 1, 2, 1190],
-    [3, 4.5, 1, 4000],
+    [1, 1, 2, 1190, 'menor'],
+    [3, 4.5, 1, 4000, 'menor'],
 ]
 
 # targetFunction = [-5, -7]

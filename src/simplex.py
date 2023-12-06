@@ -23,19 +23,26 @@ class Simplex():
         formatedConstraints = []
         constraintsLen = len(constraints)
         for constraintIndex, constraint in enumerate(constraints):
+            signal = constraint[-1]
+            constraint.pop()
             formatedConstraint = constraint
             for index in range(constraintsLen):
                 if(constraintIndex == index):
-                    formatedConstraint.insert(-1, 1)
+                    if(signal == 'menor'):
+                        formatedConstraint.insert(-1, 1)
+                    else:
+                        formatedConstraint.insert(-1, -1)
                 else:
                     formatedConstraint.insert(-1, 0)
             formatedConstraints.append(formatedConstraint)
+        print('Formated Constraints', formatedConstraints)
         self.constraints = formatedConstraints
     
     def setSimplexTable(self):
         simplexTable = self.constraints
         simplexTable.insert(0, self.targetFunction)
         self.simplexTable = simplexTable
+        print('Simplex Table', self.simplexTable)
         return self.simplexTable
 
     def findLargestNegativeValueInZ(self, simplexTable):
