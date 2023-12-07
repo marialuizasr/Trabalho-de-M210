@@ -8,14 +8,60 @@ class Simplex():
         self.iteration = 0
         self.targetFunction = targetFunction
         self.target = target
+        self.numberofCoeficientsInTargetFunction = len(targetFunction) - 1
+
+    def setNumberOfConstraints(self, numberOfConstraints):
+        self.numberOfConstraints = numberOfConstraints
+
+    def formatTargetFunction(self):
+        targetFunctionCopy = self.targetFunction
+        for index in range(self.numberOfConstraints + 1):
+            targetFunctionCopy.append(0)
+        self.targetFunction = targetFunctionCopy
+        print(self.targetFunction)
+
+    def setTableLabels(self):
+        columnsLabels = []
+        linesLabels = []
+        for index in range(len(self.targetFunction) - 1):
+            label = ""
+            if(index <= self.numberofCoeficientsInTargetFunction):
+                label = f"A{index}"
+            else:
+                label = f"B{index}"
+            columnsLabels.append(label)
+        for index in range(-1*self.numberOfConstraints, 0):
+            label = columnsLabels[index]
+            linesLabels.append(label)
+
+        self.columsLabels = columnsLabels
+        self.linesLabels = linesLabels
+
 
     def setConstraints(self, constraints):
-        self.constraints = constraints
+        formatedConstraints = []
+        constraintsLen = len(constraints)
+        for constraintIndex, constraint in enumerate(constraints):
+            signal = constraint[-1]
+            constraint.pop()
+            formatedConstraint = constraint
+            for index in range(constraintsLen):
+                if(constraintIndex == index):
+                    if(signal == 'menor'):
+                        formatedConstraint.insert(-1, 1)
+                    else:
+                        formatedConstraint.insert(-1, -1)
+                else:
+                    formatedConstraint.insert(-1, 0)
+            formatedConstraints.append(formatedConstraint)
+        print('Formated Constraints', formatedConstraints)
+        self.constraints = formatedConstraints
     
     def setSimplexTable(self):
         simplexTable = self.constraints
         simplexTable.insert(0, self.targetFunction)
         self.simplexTable = simplexTable
+        print('Simplex Table', self.simplexTable)
         return self.simplexTable
 
     def findLargestNegativeValueInZ(self, simplexTable):
@@ -52,6 +98,17 @@ class Simplex():
                     smallestRelation = relation
                     smallestRelationIndex = index
         self.pivotLineIndex = smallestRelationIndex
+        copyColumPivotIndex = self.columsLabels[self.pivotColumnIndex]
+        copyLinePivotIndex = self.linesLabels[self.pivotLineIndex - 1]
+
+        copyColumnsLabels = self.columsLabels
+        copyLinesLabels = self.linesLabels
+
+        copyColumnsLabels[self.pivotColumnIndex] = copyLinePivotIndex
+        copyLinesLabels[self.pivotLineIndex - 1] = copyColumPivotIndex
+
+        self.columsLabels = copyColumnsLabels
+        self.linesLabels = copyLinesLabels
         return self.pivotLineIndex
     
     def findPivotItem(self, simplexTable, pivotLineIndex, pivotColumnIndex):
@@ -59,7 +116,7 @@ class Simplex():
         self.pivotItem = pivotItem
         return self.pivotItem
 
-    def setNewPivotLine(self, simplexTable, pivotLineIndex, pivotItem):
+    def setReferenceLine(self, simplexTable, pivotLineIndex, pivotItem):
         auxPivotLine = simplexTable[pivotLineIndex]
         newPivotLine = []
 
@@ -89,5 +146,27 @@ class Simplex():
             return [False, self.simplexTable]
         for value in self.simplexTable[0]:
             if value < 0:
-                return [True, 0]
-        return [False, self.simplexTable[0][-1]]
+                return [True, 0, 0, 0]
+        greatProfit = self.simplexTable[0][-1]
+        shadowPrices = {
+
+        }
+        greatValues = {
+
+        }
+
+        for index, label in enumerate(self.linesLabels):
+            greatValues[label] = self.simplexTable[index + 1][-1]
+        
+        for index, label in enumerate(self.columsLabels):
+            if(index > self.numberofCoeficientsInTargetFunction and index < len(self.columsLabels) + 1):
+                shadowPrices[label] = self.simplexTable[0][index]
+        print('SHADOW PRICES:::', shadowPrices)
+        print('GREAT VALUES:::', greatValues)
+        print('greatProfit:::', greatProfit)
+        return [
+            False, 
+            greatProfit,
+            shadowPrices,
+            greatValues,
+            ]
