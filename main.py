@@ -1,5 +1,6 @@
 import tkinter as tk
 from src.simplex import Simplex
+from src.grapher import Grapher
 
 class SimplexGUI:
     def __init__(self, master):
@@ -66,6 +67,13 @@ class SimplexGUI:
         ppl.setConstraints(constraints)
         simplexTable = ppl.setSimplexTable()
 
+        config = {'x':'eixo X', 'y':'eixo Y', 'z':'eixo Z'}
+        grapher = Grapher()
+
+        number_of_variables = len(target_function) - number_of_constraints - 1
+        if number_of_variables == 2:
+            grapher.plot_2d(ppl.constraints, ppl.targetFunction, config=config)
+
         try_again = True
 
         while try_again:
@@ -86,3 +94,10 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+# -5,-7,-8
+# 2
+
+# 1,1,2,1190,menor
+# 3,4.5,1,4000,menor
