@@ -18,7 +18,7 @@ class SimplexGUI:
         self.solve_button = tk.Button(master, text="Resolver", command=self.solve)
 
         self.result_text = tk.Text(master, height=10, width=50)
-        self.result_text.config(state=tk.DISABLED)  # Para tornar o widget somente leitura
+        self.result_text.config(state=tk.DISABLED)
 
         self.target_function_label.pack()
         self.target_function_entry.pack()
