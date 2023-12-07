@@ -15,9 +15,9 @@ constraints = [
 # targetFunction = [-5, -7]
 # numberOfConstraints = 3
 # constraints = [
-#     [3, 0, 250],
-#     [0, 1.5, 100],
-#     [0.25, 0.5, 50],
+#     [3, 0, 250, 'menor'],
+#     [0, 1.5, 100, 'menor'],
+#     [0.25, 0.5, 50, 'menor'],
 # ]
 
 
@@ -59,6 +59,8 @@ ppl.setNumberOfConstraints(numberOfConstraints)
 
 ppl.formatTargetFunction()
 
+ppl.setTableLabels()
+
 ppl.setConstraints(constraints)
 simplexTable = ppl.setSimplexTable()
 
@@ -68,6 +70,18 @@ while (tryAgain):
     pivotItem = ppl.findPivotItem(simplexTable, pivotLineIndex, pivotColumnIndex)
     [referenceLine, simplexTable] = ppl.setNewPivotLine(simplexTable, pivotLineIndex, pivotItem)
     simplexTable = ppl.updateRows(simplexTable, pivotLineIndex, pivotColumnIndex, referenceLine)
-    [tryAgain, lucro] = ppl.checkIfThereIsNegativeNumberInTargetFunction()
+    [tryAgain, simplex, columsLabels, linesLabels] = ppl.checkIfThereIsNegativeNumberInTargetFunction()
 
-print('Lucro:', lucro)
+columsLabels.append('LUCRO')
+linesLabels.insert(0, 'Z')
+
+print(f'{"":<8}', end='')
+for col_label in columsLabels:
+    print(f'{col_label:<10}', end='')
+print()
+
+for i, row in enumerate(simplex):
+    print(f'{linesLabels[i]:<8}', end='')
+    for value in row:
+        print(f'{value:<10.3f}', end='')
+    print()

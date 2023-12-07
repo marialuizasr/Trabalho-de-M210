@@ -8,6 +8,7 @@ class Simplex():
         self.iteration = 0
         self.targetFunction = targetFunction
         self.target = target
+        self.numberofCoeficientsInTargetFunction = len(targetFunction) - 1
 
     def setNumberOfConstraints(self, numberOfConstraints):
         self.numberOfConstraints = numberOfConstraints
@@ -18,6 +19,24 @@ class Simplex():
             targetFunctionCopy.append(0)
         self.targetFunction = targetFunctionCopy
         print(self.targetFunction)
+
+    def setTableLabels(self):
+        columnsLabels = []
+        linesLabels = []
+        for index in range(len(self.targetFunction) - 1):
+            label = ""
+            if(index <= self.numberofCoeficientsInTargetFunction):
+                label = f"A{index}"
+            else:
+                label = f"B{index}"
+            columnsLabels.append(label)
+        for index in range(-1*self.numberOfConstraints, 0):
+            label = columnsLabels[index]
+            linesLabels.append(label)
+
+        self.columsLabels = columnsLabels
+        self.linesLabels = linesLabels
+
 
     def setConstraints(self, constraints):
         formatedConstraints = []
@@ -79,6 +98,17 @@ class Simplex():
                     smallestRelation = relation
                     smallestRelationIndex = index
         self.pivotLineIndex = smallestRelationIndex
+        copyColumPivotIndex = self.columsLabels[self.pivotColumnIndex]
+        copyLinePivotIndex = self.linesLabels[self.pivotLineIndex - 1]
+
+        copyColumnsLabels = self.columsLabels
+        copyLinesLabels = self.linesLabels
+
+        copyColumnsLabels[self.pivotColumnIndex] = copyLinePivotIndex
+        copyLinesLabels[self.pivotLineIndex - 1] = copyColumPivotIndex
+
+        self.columsLabels = copyColumnsLabels
+        self.linesLabels = copyLinesLabels
         return self.pivotLineIndex
     
     def findPivotItem(self, simplexTable, pivotLineIndex, pivotColumnIndex):
@@ -116,8 +146,8 @@ class Simplex():
             return [False, self.simplexTable]
         for value in self.simplexTable[0]:
             if value < 0:
-                return [True, 0]
-        return [False, self.simplexTable[0][-1]]
+                return [True, 0, 0, 0]
+        return [False, self.simplexTable, self.columsLabels, self.linesLabels]
 
 
 
