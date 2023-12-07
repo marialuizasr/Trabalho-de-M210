@@ -1,102 +1,88 @@
+import tkinter as tk
 from src.simplex import Simplex
 
-ppl = Simplex()
+class SimplexGUI:
+    def __init__(self, master):
+        self.master = master
+        master.title("Simplex Solver")
 
-tryAgain = True
-lucro = None
+        self.target_function_label = tk.Label(master, text="Função alvo (separada por vírgulas):")
+        self.target_function_entry = tk.Entry(master)
 
-targetFunction = [-5, -7, -8]
-numberOfConstraints = 2
-constraints = [
-    [1, 1, 2, 1190, 'menor'],
-    [3, 4.5, 1, 4000, 'menor'],
-]
+        self.number_of_constraints_label = tk.Label(master, text="Número de restrições:")
+        self.number_of_constraints_entry = tk.Entry(master)
 
-# targetFunction = [-5, -7]
-# numberOfConstraints = 3
-# constraints = [
-#     [3, 0, 250, 'menor'],
-#     [0, 1.5, 100, 'menor'],
-#     [0.25, 0.5, 50, 'menor'],
-# ]
+        self.constraints_label = tk.Label(master, text="Restrições (uma por linha, separadas por vírgulas e tipo):")
+        self.constraints_entry = tk.Text(master, height=5, width=50)
+
+        self.solve_button = tk.Button(master, text="Resolver", command=self.solve)
+
+        self.result_text = tk.Text(master, height=10, width=50)
+        self.result_text.config(state=tk.DISABLED)  # Para tornar o widget somente leitura
+
+        self.target_function_label.pack()
+        self.target_function_entry.pack()
+        self.number_of_constraints_label.pack()
+        self.number_of_constraints_entry.pack()
+        self.constraints_label.pack()
+        self.constraints_entry.pack()
+        self.solve_button.pack()
+        self.result_text.pack()
+
+    def get_user_input(self):
+        target_function = [float(x) for x in self.target_function_entry.get().replace(' ', '').split(',')]
+        number_of_constraints = int(self.number_of_constraints_entry.get())
+        constraints_text = self.constraints_entry.get("1.0", tk.END)
+        constraints_lines = constraints_text.splitlines()
+        constraints = [line.split(',')[:-1] + [float(line.split(',')[-1])] if line.split(',')[-1].replace('.', '', 1).isdigit() else line.split(',') for line in constraints_lines]
+
+        return target_function, number_of_constraints, constraints
+
+    def show_results(self, shadow_prices, great_values, great_profit):
+        result_str = "Resultados:\n"
+        for key in shadow_prices:
+            result_str += f'PREÇO SOMBRA DE {key}: {shadow_prices[key]}\n'
+
+        for key in great_values:
+            result_str += f'VALOR ÓTIMO DE {key}: {great_values[key]}\n'
+
+        result_str += f'LUCRO ÓTIMO: {great_profit}\n'
+
+        # Atualiza o widget de texto com os resultados
+        self.result_text.config(state=tk.NORMAL)
+        self.result_text.delete("1.0", tk.END)
+        self.result_text.insert(tk.END, result_str)
+        self.result_text.config(state=tk.DISABLED)
+
+    def solve(self):
+        target_function, number_of_constraints, constraints = self.get_user_input()
+
+        ppl = Simplex()
+
+        ppl.setTargetFunction(target_function, 'max')
+        ppl.setNumberOfConstraints(number_of_constraints)
+        ppl.formatTargetFunction()
+        ppl.setTableLabels()
+        ppl.setConstraints(constraints)
+        simplexTable = ppl.setSimplexTable()
+
+        try_again = True
+
+        while try_again:
+            largest_negative, pivot_column_index = ppl.findLargestNegativeValueInZ(simplexTable)
+            pivot_line_index = ppl.findPivotLine(simplexTable, pivot_column_index)
+            pivot_item = ppl.findPivotItem(simplexTable, pivot_line_index, pivot_column_index)
+            reference_line, simplexTable = ppl.setReferenceLine(simplexTable, pivot_line_index, pivot_item)
+            simplexTable = ppl.updateRows(simplexTable, pivot_line_index, pivot_column_index, reference_line)
+            try_again, great_profit, shadow_prices, great_values = ppl.checkIfThereIsNegativeNumberInTargetFunction()
+
+        self.show_results(shadow_prices, great_values, great_profit)
 
 
-# targetFunction = [-25, -50, 0, 0, 0, 0]
-# constraints = [
-#     [7, 5, 1, 0, 0, 35],
-#     [4, 6, 0, 1, 0, 24],
-#     [3, 10, 0, 0, 1, 30]
-# ]
+def main():
+    root = tk.Tk()
+    simplex_gui = SimplexGUI(root)
+    root.mainloop()
 
-# targetFunction = [0.06, 0.08, 0, 0, 0, 0]
-# constraints = [
-#     [8, 6, -1, 0, 0, 48],
-#     [1, 2, 0, -1, 0, 12],
-#     [1, 2, 0, 0, 1, 20]
-# ]
-
-# targetFunction = [12, 7, 0, 0, 0, 0, 0]
-# constraints = [
-#     [2, 1, -1, 0, 0, 0, 4],
-#     [1, 6, 0, -1, 0, 0, 6],
-#     [1, 0, 0, 0, 1, 0, 4],
-#     [0, 1, 0, 0, 0, 1, 6],
-# ]
-
-# ppl.setTargetFunction(targetFunction, 'min')
-
-#### PSEUDO CÓDIGO
-
-# entre com a funcao objetivo (coeficientes)
-
-# entre com o número de restricoes
-
-# entre com as restricoes
-
-ppl.setTargetFunction(targetFunction, 'max')
-
-ppl.setNumberOfConstraints(numberOfConstraints)
-
-ppl.formatTargetFunction()
-
-ppl.setTableLabels()
-
-ppl.setConstraints(constraints)
-simplexTable = ppl.setSimplexTable()
-
-while (tryAgain):
-    [largestNegative, pivotColumnIndex] = ppl.findLargestNegativeValueInZ(simplexTable)
-    pivotLineIndex = ppl.findPivotLine(simplexTable, pivotColumnIndex)
-    pivotItem = ppl.findPivotItem(simplexTable, pivotLineIndex, pivotColumnIndex)
-    [referenceLine, simplexTable] = ppl.setReferenceLine(simplexTable, pivotLineIndex, pivotItem)
-    simplexTable = ppl.updateRows(simplexTable, pivotLineIndex, pivotColumnIndex, referenceLine)
-    [
-        tryAgain, 
-        greatProfit,
-        shadowPrices,
-        greatValues,
-        ] = ppl.checkIfThereIsNegativeNumberInTargetFunction()
-
-# columsLabels.append('LUCRO')
-# # linesLabels.insert(0, 'Z')
-
-# print(f'{"":<8}', end='')
-# for col_label in columsLabels:
-#     print(f'{col_label:<10}', end='')
-# print()
-
-# for i, row in enumerate(simplex):
-#     print(f'{linesLabels[i]:<8}', end='')
-#     for value in row:
-#         print(f'{value:<10.3f}', end='')
-#     print()
-
-# print('\n\n')
-
-for key in shadowPrices:
-    print('PREÇO SOMBRA DE ', key, ':', shadowPrices[key])
-
-for key in greatValues:
-    print('VALOR ÓTIMO DE ', key, ':', greatValues[key])
-
-print('LUCRO ÓTIMO: ', greatProfit)
+if __name__ == "__main__":
+    main()
