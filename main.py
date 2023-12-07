@@ -68,9 +68,16 @@ while (tryAgain):
     [largestNegative, pivotColumnIndex] = ppl.findLargestNegativeValueInZ(simplexTable)
     pivotLineIndex = ppl.findPivotLine(simplexTable, pivotColumnIndex)
     pivotItem = ppl.findPivotItem(simplexTable, pivotLineIndex, pivotColumnIndex)
-    [referenceLine, simplexTable] = ppl.setNewPivotLine(simplexTable, pivotLineIndex, pivotItem)
+    [referenceLine, simplexTable] = ppl.setReferenceLine(simplexTable, pivotLineIndex, pivotItem)
     simplexTable = ppl.updateRows(simplexTable, pivotLineIndex, pivotColumnIndex, referenceLine)
-    [tryAgain, simplex, columsLabels, linesLabels] = ppl.checkIfThereIsNegativeNumberInTargetFunction()
+    [
+        tryAgain, 
+        simplex, 
+        columsLabels, 
+        linesLabels,
+        shadowPrices,
+        greatValues,
+        greatProfit] = ppl.checkIfThereIsNegativeNumberInTargetFunction()
 
 columsLabels.append('LUCRO')
 linesLabels.insert(0, 'Z')
@@ -85,3 +92,13 @@ for i, row in enumerate(simplex):
     for value in row:
         print(f'{value:<10.3f}', end='')
     print()
+
+print('\n\n')
+
+for key in shadowPrices:
+    print('PREÇO SOMBRA DE ', key, ':', shadowPrices[key])
+
+for key in greatValues:
+    print('VALOR ÓTIMO DE ', key, ':', greatValues[key])
+
+print('LUCRO ÓTIMO: ', greatProfit)

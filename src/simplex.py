@@ -116,7 +116,7 @@ class Simplex():
         self.pivotItem = pivotItem
         return self.pivotItem
 
-    def setNewPivotLine(self, simplexTable, pivotLineIndex, pivotItem):
+    def setReferenceLine(self, simplexTable, pivotLineIndex, pivotItem):
         auxPivotLine = simplexTable[pivotLineIndex]
         newPivotLine = []
 
@@ -146,8 +146,32 @@ class Simplex():
             return [False, self.simplexTable]
         for value in self.simplexTable[0]:
             if value < 0:
-                return [True, 0, 0, 0]
-        return [False, self.simplexTable, self.columsLabels, self.linesLabels]
+                return [True, 0, 0, 0, 0, 0, 0]
+        greatProfit = self.simplexTable[0][-1]
+        shadowPrices = {
+
+        }
+        greatValues = {
+
+        }
+
+        for index, label in enumerate(self.linesLabels):
+            greatValues[label] = self.simplexTable[index + 1][-1]
+        
+        for index, label in enumerate(self.columsLabels):
+            if(index > self.numberofCoeficientsInTargetFunction and index < len(self.columsLabels) + 1):
+                shadowPrices[label] = self.simplexTable[0][index]
+        print('SHADOW PRICES:::', shadowPrices)
+        print('GREAT VALUES:::', greatValues)
+        print('greatProfit:::', greatProfit)
+        return [
+            False, 
+            self.simplexTable, 
+            self.columsLabels,
+            self.linesLabels,
+            shadowPrices,
+            greatValues,
+            greatProfit]
 
 
 
