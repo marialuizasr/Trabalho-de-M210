@@ -146,7 +146,7 @@ class Simplex():
             return [False, self.simplexTable]
         for value in self.simplexTable[0]:
             if value < 0:
-                return [True, 0, 0, 0, 0, 0, 0]
+                return [True, 0, 0, 0]
         greatProfit = self.simplexTable[0][-1]
         shadowPrices = {
 
@@ -166,15 +166,7 @@ class Simplex():
         print('greatProfit:::', greatProfit)
         return [
             False, 
-            self.simplexTable, 
-            self.columsLabels,
-            self.linesLabels,
+            greatProfit,
             shadowPrices,
             greatValues,
-            greatProfit]
-
-
-
-        
-        
-
+            ]

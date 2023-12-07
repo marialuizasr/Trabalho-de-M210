@@ -72,28 +72,26 @@ while (tryAgain):
     simplexTable = ppl.updateRows(simplexTable, pivotLineIndex, pivotColumnIndex, referenceLine)
     [
         tryAgain, 
-        simplex, 
-        columsLabels, 
-        linesLabels,
+        greatProfit,
         shadowPrices,
         greatValues,
-        greatProfit] = ppl.checkIfThereIsNegativeNumberInTargetFunction()
+        ] = ppl.checkIfThereIsNegativeNumberInTargetFunction()
 
-columsLabels.append('LUCRO')
-linesLabels.insert(0, 'Z')
+# columsLabels.append('LUCRO')
+# # linesLabels.insert(0, 'Z')
 
-print(f'{"":<8}', end='')
-for col_label in columsLabels:
-    print(f'{col_label:<10}', end='')
-print()
+# print(f'{"":<8}', end='')
+# for col_label in columsLabels:
+#     print(f'{col_label:<10}', end='')
+# print()
 
-for i, row in enumerate(simplex):
-    print(f'{linesLabels[i]:<8}', end='')
-    for value in row:
-        print(f'{value:<10.3f}', end='')
-    print()
+# for i, row in enumerate(simplex):
+#     print(f'{linesLabels[i]:<8}', end='')
+#     for value in row:
+#         print(f'{value:<10.3f}', end='')
+#     print()
 
-print('\n\n')
+# print('\n\n')
 
 for key in shadowPrices:
     print('PREÇO SOMBRA DE ', key, ':', shadowPrices[key])
