@@ -7,106 +7,97 @@ class SimplexGUI:
         self.master = master
         master.title("Simplex Solver")
 
-        self.create_widgets()
+        self.target_function_label = tk.Label(master, text="Função alvo (separada por vírgulas):")
+        self.target_function_entry = tk.Entry(master)
 
-    def create_widgets(self):
-        # Labels
-        self.label_target_function = tk.Label(self.master, text="Função Objetivo (separe os coeficientes por vírgula):")
-        self.label_constraints = tk.Label(self.master, text="Restrições (uma por linha, separe os coeficientes por vírgula):")
-        self.label_optimization_type = tk.Label(self.master, text="Tipo de Otimização (max ou min):")
+        self.number_of_constraints_label = tk.Label(master, text="Número de restrições:")
+        self.number_of_constraints_entry = tk.Entry(master)
 
-        # Entry Widgets
-        self.entry_target_function = tk.Entry(self.master)
-        self.entry_constraints = tk.Text(self.master, height=5, width=30)
-        self.entry_optimization_type = tk.Entry(self.master)
+        self.constraints_label = tk.Label(master, text="Restrições (uma por linha, separadas por vírgulas e tipo):")
+        self.constraints_entry = tk.Text(master, height=5, width=50)
 
-        # Button
-        self.solve_button = tk.Button(self.master, text="Resolver", command=self.solve_simplex)
+        self.solve_button = tk.Button(master, text="Resolver", command=self.solve)
 
-        # Result Label
-        self.result_label = tk.Label(self.master, text="")
+        self.result_text = tk.Text(master, height=10, width=50)
+        self.result_text.config(state=tk.DISABLED)
 
-        # Layout
-        self.label_target_function.pack()
-        self.entry_target_function.pack()
-
-        self.label_constraints.pack()
-        self.entry_constraints.pack()
-
-        self.label_optimization_type.pack()
-        self.entry_optimization_type.pack()
-
+        self.target_function_label.pack()
+        self.target_function_entry.pack()
+        self.number_of_constraints_label.pack()
+        self.number_of_constraints_entry.pack()
+        self.constraints_label.pack()
+        self.constraints_entry.pack()
         self.solve_button.pack()
-        self.result_label.pack()
+        self.result_text.pack()
 
-    def solve_simplex(self):
+    def get_user_input(self):
+        target_function = [float(x) for x in self.target_function_entry.get().replace(' ', '').split(',')]
+        number_of_constraints = int(self.number_of_constraints_entry.get())
+        constraints_text = self.constraints_entry.get("1.0", tk.END)
+        constraints_lines = constraints_text.splitlines()
+        constraints = [line.split(',')[:-1] + [float(line.split(',')[-1])] if line.split(',')[-1].replace('.', '', 1).isdigit() else line.split(',') for line in constraints_lines]
+
+        return target_function, number_of_constraints, constraints
+
+    def show_results(self, shadow_prices, great_values, great_profit):
+        result_str = "Resultados:\n"
+        for key in shadow_prices:
+            result_str += f'PREÇO SOMBRA DE {key}: {shadow_prices[key]}\n'
+
+        for key in great_values:
+            result_str += f'VALOR ÓTIMO DE {key}: {great_values[key]}\n'
+
+        result_str += f'LUCRO ÓTIMO: {great_profit}\n'
+
+        # Atualiza o widget de texto com os resultados
+        self.result_text.config(state=tk.NORMAL)
+        self.result_text.delete("1.0", tk.END)
+        self.result_text.insert(tk.END, result_str)
+        self.result_text.config(state=tk.DISABLED)
+
+    def solve(self):
+        target_function, number_of_constraints, constraints = self.get_user_input()
+
         ppl = Simplex()
 
-        try_again = True
-        lucro = None
-
-        target_function = [float(x) for x in self.entry_target_function.get().split(',')]
-
-        constraints_text = self.entry_constraints.get("1.0", tk.END).split('\n')[:-1]
-        constraints = [list(map(float, line.split(','))) for line in constraints_text]
-
-        num_vars = sum(1 for x in target_function if x != 0)
-        restrictions = []
-        for constraint in constraints:
-            restriction = {
-                f'x{i+1}': constraint[i] for i in range(num_vars)
-            }
-            restriction['y'] = constraint[-1]
-
-            type_index = next((i for i, x in enumerate(constraint[num_vars:-1], num_vars) if x != 0), None)
-            restriction['type'] = 'less' if constraint[type_index] == 1 else 'more'
-
-            restrictions.append(restriction)
+        ppl.setTargetFunction(target_function, 'max')
+        ppl.setNumberOfConstraints(number_of_constraints)
+        ppl.formatTargetFunction()
+        ppl.setTableLabels()
+        ppl.setConstraints(constraints)
+        simplexTable = ppl.setSimplexTable()
 
         config = {'x':'eixo X', 'y':'eixo Y', 'z':'eixo Z'}
         grapher = Grapher()
 
-        if num_vars == 2:
-            grapher.plot_2d(restrictions, config=config)
-        elif num_vars == 3:
-            grapher.plot_3d(restrictions, config=config)
+        number_of_variables = len(target_function) - number_of_constraints - 1
+        if number_of_variables == 2:
+            grapher.plot_2d(ppl.constraints, ppl.targetFunction, config=config)
 
-        optimization_type = self.entry_optimization_type.get().lower()
-
-        ppl.setTargetFunction(target_function, optimization_type)
-        ppl.setConstraints(constraints)
-
-        simplexTable = ppl.setSimplexTable()
-
+        try_again = True
 
         while try_again:
-            [largest_negative, pivot_column_index] = ppl.findLargestNegativeValueInZ(simplexTable)
+            largest_negative, pivot_column_index = ppl.findLargestNegativeValueInZ(simplexTable)
             pivot_line_index = ppl.findPivotLine(simplexTable, pivot_column_index)
             pivot_item = ppl.findPivotItem(simplexTable, pivot_line_index, pivot_column_index)
-            [reference_line, simplexTable] = ppl.setNewPivotLine(simplexTable, pivot_line_index, pivot_item)
+            reference_line, simplexTable = ppl.setReferenceLine(simplexTable, pivot_line_index, pivot_item)
             simplexTable = ppl.updateRows(simplexTable, pivot_line_index, pivot_column_index, reference_line)
-            [try_again, lucro] = ppl.checkIfThereIsNegativeNumberInTargetFunction()
+            try_again, great_profit, shadow_prices, great_values = ppl.checkIfThereIsNegativeNumberInTargetFunction()
 
-        self.result_label.config(text=f'Lucro: {lucro}')
+        self.show_results(shadow_prices, great_values, great_profit)
 
 
-if __name__ == "__main__":
+def main():
     root = tk.Tk()
-    app = SimplexGUI(root)
+    simplex_gui = SimplexGUI(root)
     root.mainloop()
 
-'''
-12,7,0,0,0,0,0
+if __name__ == "__main__":
+    main()
 
-2,1,-1,0,0,0,4
-1,6,0,-1,0,0,6
-1,0,0,0,1,0,4
-0,1,0,0,0,1,6
-'''
-'''
--5,-7,-8,0,0,0
 
-1,1,2,1,0,1190
-3,4.5,1,0,1,4000
-0.25,0.5,0,0,1,50
-'''
+# -5,-7,-8
+# 2
+
+# 1,1,2,1190,menor
+# 3,4.5,1,4000,menor

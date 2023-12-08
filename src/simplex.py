@@ -85,10 +85,10 @@ class Simplex():
         smallestRelationIndex = None
 
         for item in enumerate(simplexTable):
-            rightSide = item[1][-1]
-            valueInPivotColumn = item[1][pivotColumnIndex]
+            rightSide = float(item[1][-1])
+            valueInPivotColumn = float(item[1][pivotColumnIndex])
             if(valueInPivotColumn > 0):
-                relation = rightSide/valueInPivotColumn
+                relation = rightSide / valueInPivotColumn
             else:
                 relation = infinity
             relations.append(relation)
@@ -112,7 +112,7 @@ class Simplex():
         return self.pivotLineIndex
     
     def findPivotItem(self, simplexTable, pivotLineIndex, pivotColumnIndex):
-        pivotItem = simplexTable[pivotLineIndex][pivotColumnIndex]
+        pivotItem = float(simplexTable[pivotLineIndex][pivotColumnIndex])
         self.pivotItem = pivotItem
         return self.pivotItem
 
@@ -121,7 +121,7 @@ class Simplex():
         newPivotLine = []
 
         for value in auxPivotLine:
-            newValueInPivotLine = value/pivotItem
+            newValueInPivotLine = float(value) / pivotItem
             newPivotLine.append(newValueInPivotLine)
 
         self.simplexTable[pivotLineIndex] = newPivotLine
@@ -134,7 +134,7 @@ class Simplex():
             if(index != pivotLineIndex):
                 newLine = []
                 for position, element in enumerate(row):
-                    newElement = element + auxSimplexTable[index][pivotColumnIndex]*referenceLine[position]*(-1)
+                    newElement = float(element) + float(auxSimplexTable[index][pivotColumnIndex]) * float(referenceLine[position]) * (-1)
                     newLine.append(newElement)
                 simplexTable[index] = newLine
         self.simplexTable = simplexTable
